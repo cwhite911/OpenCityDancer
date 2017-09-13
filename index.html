@@ -1,0 +1,197 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.css' rel='stylesheet' />
+        <style>
+          body {
+              padding: 0;
+              margin: 0;
+          }
+          html, body, #map {
+              height: 100%;
+              width: 100%;
+          }
+          #audioElement {
+            visibility: 'hidden';
+          }
+      </style>
+
+    </head>
+    <body>
+        <!--[if lte IE 9]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+        <![endif]-->
+        <!-- <iframe id='AmazonMusicEmbedB01LRZ26WG' src='https://music.amazon.com/embed/B01LRZ26WG/?id=E05pIHfEvq&marketplaceId=ATVPDKIKX0DER&musicTerritory=US' width='100%' height='200'></iframe> -->
+        <!-- <audio id="audioElement" src="./music/songmp3.mp3" type="audio/mp3" autoplay></audio> -->
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.js'></script>
+
+        <div id='map'></div>
+        <script>
+          var src = "https://s3.amazonaws.com/plott-random/songmp3.mp3";
+          // var seconds = 1000;
+          var audio = new Audio();
+          var audioCtx, audioSrc, analyser;
+
+          audio.addEventListener('canplay', function() {
+            console.log("canplay")
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioSrc = audioCtx.createMediaElementSource(audio);
+            analyser = audioCtx.createAnalyser();
+            // Bind our analyser to the media element source.
+            audioSrc.connect(analyser);
+            audioSrc.connect(audioCtx.destination);
+            analyser.connect(audioCtx.destination);
+            audio.play();
+          });
+
+          audio.crossOrigin = "anonymous";
+          audio.src = 'https://api.soundcloud.com/tracks/42328219/stream?client_id=b1495e39071bd7081a74093816f77ddb';
+
+          mapboxgl.accessToken = 'pk.eyJ1IjoiY3R3aGl0ZSIsImEiOiItb0dqdUlZIn0.4Zb1DGESXnx0ePxMVLihZQ';
+
+
+          var map = new mapboxgl.Map({
+            style: 'mapbox://styles/mapbox/dark-v9',
+              center: [-78.9002, 35.9939],
+              zoom: 15,
+              pitch: 45,
+              bearing: -17.6,
+              hash: true,
+              container: 'map'
+          });
+
+          // var frequency = generateFrequencies(seconds);
+
+          // The 'building' layer in the mapbox-streets vector source contains building-height
+          // data from OpenStreetMap.
+          map.on('load', function() {
+            var bins = 8;
+            var maxHeight = 80;
+            var binWidth = maxHeight / bins;
+
+            // Divide the buildings into 16 bins based on their true height, using a layer filter.
+            for (var i = 0; i < bins; i++) {
+                map.addLayer({
+                    'id': '3d-buildings-' + i,
+                    'source': 'composite',
+                    'source-layer': 'building',
+                    'filter': ['all', ['==', 'extrude', 'true'], ['>', 'height', i * binWidth], ['<=', 'height', (i + 1) * binWidth]],
+                    'type': 'fill-extrusion',
+                    'minzoom': 15,
+                    'paint': {
+                        'fill-extrusion-color': '#aaa',
+                        'fill-extrusion-height-transition': {
+                            duration: 0,
+                            delay: 0
+                        },
+                        'fill-extrusion-opacity': .6
+                    }
+                });
+            }
+
+
+            //var frequencyData = new Uint8Array(analyser.frequencyBinCount);
+            var frequencyData = new Uint8Array(bins); //was 200
+            // document.getElementById('audioElement').play();
+              // Insert the layer beneath any symbol layer.
+              // var layers = map.getStyle().layers.reverse();
+              // var labelLayerIdx = layers.findIndex(function (layer) {
+              //     return layer.type !== 'symbol';
+              // });
+              // var labelLayerId = labelLayerIdx !== -1 ? layers[labelLayerIdx].id : undefined;
+              // map.addLayer({
+              //     'id': '3d-buildings',
+              //     'source': 'composite',
+              //     'source-layer': 'building',
+              //     'filter': ['all', ['==', 'extrude', 'true']],
+              //     'type': 'fill-extrusion',
+              //     'minzoom': 15,
+              //     'paint': {
+              //         'fill-extrusion-color': '#aaa',
+              //         'fill-extrusion-height': {
+              //             'type': 'identity',
+              //             'property': 'height'
+              //         },
+              //         'fill-extrusion-base': {
+              //             'type': 'identity',
+              //             'property': 'min_height'
+              //         },
+              //         'fill-extrusion-opacity': .6
+              //     }
+              // }, labelLayerId);
+
+
+
+              setInterval(funkyTown, 250);
+              var avg = 0;
+              function funkyTown() {
+                // console.log();
+                analyser.getByteFrequencyData(frequencyData)
+                console.log(frequencyData.length, frequencyData);
+
+                // map.setPaintProperty('3d-buildings', 'fill-extrusion-height', frequencyData[0]);
+                // map.setPaintProperty('3d-buildings', 'fill-extrusion-base', frequencyData[1]);
+                // map.setPaintProperty('3d-buildings-' + i, 'fill-extrusion-height', 10 + 4 + frequencyData[0]);
+                for (var i = 0; i < bins; i++) {
+                    avg += frequencyData[i];
+                    map.setPaintProperty('3d-buildings-' + i, 'fill-extrusion-color', getRandomColor(frequencyData[i]));
+                    map.setPaintProperty('3d-buildings-' + i, 'fill-extrusion-height',  frequencyData[i]);
+                    //  map.setPaintProperty('3d-buildings-' + i, 'fill-extrusion-base', frequencyData[bins.length - i]);
+                }
+                // map.setBearing(avg / 500);
+                // map.setLight({
+                //     color: "hsl(" + avg / 100 % 360 + "," + Math.min(50 + avg / 4, 100) + "%,50%)",
+                //     intensity: Math.min(1, avg / 256 * 10)
+                // });
+                // map.easeTo(1000, easing,[-78.6384, 35.7843], true);
+
+                // seconds--;
+              }
+
+              setInterval(function() {
+                rotateBy(map.getBearing());
+              }, 1500);
+
+          });
+
+
+
+        function easing(t) {
+            return t;
+        }
+
+          function rotateBy(current) {
+             var rotateNumber = current;
+             map.rotateTo(rotateNumber + 90, {duration: 2000, easing: function(t) {return t;}});
+         }
+
+          function generateFrequencies(n) {
+            var freq = [];
+            var i = 0;
+            for (i; i < n; i++) {
+              freq.push(Math.floor((Math.random() * 100) + 1));
+            }
+            return freq;
+          }
+
+          function getRandomColor(freq) {
+            var letters = '0123456789ABCDEF0123456789ABCDEF';
+            var color = '#98F';
+            console.log(Math.floor(Math.random() * 16),Math.floor(freq /10));
+            for (var i = 0; i < 3; i++) {
+              color += letters[Math.floor(Math.floor(freq /8))];
+            }
+            return color;
+          }
+
+
+        </script>
+
+    </body>
+</html>
