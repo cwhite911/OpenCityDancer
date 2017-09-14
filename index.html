@@ -134,8 +134,10 @@
                 }
                 var d = new Date();
                 var now = d.valueOf();
-                map.setBearing(now / 500);
-
+                if (!audio.paused) {
+                  map.setBearing(now / 500);
+                }
+        
                 requestAnimationFrame(funkyTown);
               }
               requestAnimationFrame(funkyTown);
