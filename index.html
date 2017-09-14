@@ -53,7 +53,7 @@
           });
 
           audio.crossOrigin = "anonymous";
-          audio.src = 'https://api.soundcloud.com/tracks/42328220/stream?client_id=b1495e39071bd7081a74093816f77ddb';
+          audio.src = src; //'https://api.soundcloud.com/tracks/42328220/stream?client_id=b1495e39071bd7081a74093816f77ddb';
 
           mapboxgl.accessToken = 'pk.eyJ1IjoiY3R3aGl0ZSIsImEiOiItb0dqdUlZIn0.4Zb1DGESXnx0ePxMVLihZQ';
 
@@ -84,8 +84,12 @@
               trackUserLocation: true
           }), 'top-left');
 
-          // var frequency = generateFrequencies(seconds);
-
+          map.on('click', function(){
+            if (audio.paused) {
+              return audio.play();
+            }
+            audio.pause();
+          });
           // The 'building' layer in the mapbox-streets vector source contains building-height
           // data from OpenStreetMap.
           map.on('load', function() {
