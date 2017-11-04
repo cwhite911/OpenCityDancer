@@ -22,6 +22,17 @@
             width: auto;
           }
 
+          .playbutton {
+            /*border-radius: 50%;
+            border: 1px hsl(171, 100%, 41%) solid;*/
+          }
+
+          .playbutton:hover {
+            cursor: pointer;
+            color: white;
+            /*border: 1px white solid;*/
+          }
+
       </style>
 
     </head>
@@ -33,12 +44,30 @@
         <script src='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.js'></script>
         <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.min.js'></script>
         <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.css' type='text/css' />
-
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.0/css/bulma.min.css">
+        <div id="playModal" class="modal is-active">
+          <div class="modal-background"></div>
+            <div class="modal-content has-text-centered">
+            <h1 class="has-text-light">Press Play</h2>
+              <div class="playbutton">
+              <span class="icon is-large">
+              <span class="fa-stack fa-lg">
+                <i class="fa fa-play fa-stack-2x has-text-primary"></i>
+              </span>
+            </span>
+          </div>
+          </div>
+          <button class="modal-close is-large" aria-label="close"></button>
+        </div>
         <div id='map'></div>
         <script>
           var src = "music/songmp3.mp3";
           var audio = new Audio();
           var audioCtx, audioSrc, analyser;
+          var playModal = document.getElementById('playModal');
+
+
           audio.addEventListener('canplay', function() {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             audioSrc = audioCtx.createMediaElementSource(audio);
@@ -47,11 +76,16 @@
             audioSrc.connect(analyser);
             audioSrc.connect(audioCtx.destination);
             analyser.connect(audioCtx.destination);
+            // audio.play();
+          });
+
+          playModal.addEventListener('click', function() {
+            playModal.classList.remove('is-active');
             audio.play();
           });
 
           audio.crossOrigin = "anonymous";
-          audio.src = src; //'https://api.soundcloud.com/tracks/42328220/stream?client_id=b1495e39071bd7081a74093816f77ddb';
+          // audio.src = 'https://api.soundcloud.com/tracks/42328220/stream?client_id=b1495e39071bd7081a74093816f77ddb';
 
           mapboxgl.accessToken = 'pk.eyJ1IjoiY3R3aGl0ZSIsImEiOiItb0dqdUlZIn0.4Zb1DGESXnx0ePxMVLihZQ';
           var map = new mapboxgl.Map({
@@ -70,28 +104,11 @@
 
           map.addControl(new mapboxgl.FullscreenControl());
 
-
-          var geocoder = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken
-          });
-
-          map.addControl(geocoder, 'top-left');
-
-          geocoder.on('result', function(ev) {
-              map.setZoom(15);
-          });
-
-          map.addControl(new mapboxgl.GeolocateControl({
-              positionOptions: {
-                  enableHighAccuracy: true
-              },
-              trackUserLocation: true
-          }), 'top-left');
-
           map.on('click', function(){
             if (audio.paused) {
               return audio.play();
             }
+            playModal.classList.add('is-active');
             audio.pause();
           });
           // The 'building' layer in the mapbox-streets vector source contains building-height
