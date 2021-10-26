@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link href='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.css' rel='stylesheet' />
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet">
         <style>
           body {
               padding: 0;
@@ -35,8 +35,7 @@
         <!--[if lte IE 9]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
         <![endif]-->
-
-        <script src='https://api.mapbox.com/mapbox-gl-js/v0.40.0/mapbox-gl.js'></script>
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
         <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.min.js'></script>
         <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.1.1/mapbox-gl-geocoder.css' type='text/css' />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -59,9 +58,8 @@
           const audio = new Audio();  
           const playModal = document.getElementById('playModal');
           var audioCtx, audioSrc, analyser;
-          
 
-          mapboxgl.accessToken = 'pk.eyJ1IjoiY3R3aGl0ZSIsImEiOiItb0dqdUlZIn0.4Zb1DGESXnx0ePxMVLihZQ';
+          mapboxgl.accessToken = 'pk.eyJ1IjoiY3R3aGl0ZSIsImEiOiJja3Y4aWlhNmcwMXZjMnhtbHJtZDNtaDcwIn0.cye8-ZqToN5CqEtZpQr-Hg';
           const map = new mapboxgl.Map({
             style: 'mapbox://styles/mapbox/dark-v9',
               // center: [-78.9002, 35.9939],
@@ -91,8 +89,8 @@
           
 
             audio.crossOrigin = "anonymous";
-            audio.src = 'https://api.soundcloud.com/tracks/42328220/stream?client_id=b1495e39071bd7081a74093816f77ddb';
-            const bins =16;
+            audio.src = 'http://jPlayer.org/audio/m4a/Miaow-01-Tempered-song.m4a';
+            const bins =50;
             const maxHeight = 500;
             const binWidth = maxHeight / bins;
 
